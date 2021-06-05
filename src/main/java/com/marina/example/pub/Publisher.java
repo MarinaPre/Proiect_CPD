@@ -1,48 +1,69 @@
 package com.marina.example.pub;
-
+/*
+- facem pub la mesaje in functie de topic
+ */
 import com.marina.example.Server.TokenServer;
+import com.marina.example.sub.Subscriber;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.io.BufferedReader;
-
-import java.io.PrintWriter;
-import java.net.Socket;
+import java.util.Scanner;
 
 @Component
 public class Publisher extends Thread {
     @Autowired
     PubsubOutboundGateway gateway;
     private static Logger LOGGER =  LoggerFactory.getLogger(Publisher.class);
-
     private final TokenServer tokenServer;
+    private final Subscriber subscriber;
+    private boolean askedToSendToken;
 
-    public Publisher(TokenServer tokenServer){
+    public Publisher(TokenServer tokenServer, Subscriber subscriber){
         this.tokenServer = tokenServer;
-        System.out.println("Se executa");
-
-       // this.start();
+        this.subscriber = subscriber;
+        this.askedToSendToken = false;
     }
 
     @Override
     public void run() {
-
-        System.out.println("Publisher run");
-        System.out.println("Din publisher " + tokenServer.getHaveToken().get());
+        Scanner scan = new Scanner(System.in);
+        String message;
+        String[] messageSplit;
 
         while(true) {
-            if (tokenServer.getHaveToken().get()) {
-                gateway.sendToPubsubCooking("news on cooking");
-                LOGGER.info("keep alive Cooking");
-            }
+            message = scan.nextLine();
 
-            try {
-                sleep(2000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
+            if (tokenServer.getHaveToken().get()) {
+                messageSplit= message.split(":");
+
+                if(messageSplit[0].equals("Cooking")) {
+                    gateway.sendToPubsubCooking(messageSplit[1]);
+                    subscriber.setSentMessage(messageSplit[1]);
+
+                }else if(messageSplit[0].equals("Art")){
+                    gateway.sendToPubsubArt(messageSplit[1]);
+                    subscriber.setSentMessage(messageSplit[1]);
+
+                }else if(message.equalsIgnoreCase("Send Token")){
+                   this.askedToSendToken = true;
+                }else{
+                    System.out.println("You are not subscribed to: " + messageSplit[0]);
+                }
+            }else{
+                System.out.println("It's not your time to talk!");
             }
         }
+    }
+
+    public boolean isAskedToSendToken() {
+        return askedToSendToken;
+    }
+
+    public void setAskedToSendToken(boolean askedToSendToken) {
+        this.askedToSendToken = askedToSendToken;
     }
 }

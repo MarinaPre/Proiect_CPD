@@ -1,8 +1,8 @@
 package com.marina.example.Server;
 
-import com.marina.example.pub.Publisher;
-import org.springframework.context.annotation.Bean;
-import org.springframework.stereotype.Component;
+/*
+- serverul asteapta primirea tokenului
+ */
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -35,30 +35,15 @@ public class ClientHandler extends Thread{
             String message;
 
             while ((message = fromClient.readLine()) != null ) {
-               // System.out.println("s2: From clien1: " + message);
-                System.out.println(Time.valueOf(LocalTime.now()));
 
                 if(message.contains("token")) {
-                    //System.out.println("s2: raspuns din clienthandler 2: " + message);
                     tokenServer.setWhenReceived(new AtomicLong(System.currentTimeMillis()));
                     tokenServer.setToken(message);
                     tokenServer.setHaveToken(new AtomicBoolean(true));
-                    toClient.println("Got the tokens1");
-                    System.out.println("am tokens1 " + message);
-                    System.out.println("Din client handler: " + tokenServer.getHaveToken().get());
-                }
-                else if(message.contains("Client")){
-                   // toClient.println("Welcome!s1 " + message);
-                    //System.out.println("s2: raspuns server: " + "Welcome!");
 
-                }
-                else if(message.contains("Out")){
-                    //System.out.println("s2: raspuns server: " + "Bye!");
-                    break;
+                    System.out.println("Client1: Got the token: " + message);
                 }
             }
-            //socketForClientClient.close();
-
         } catch (IOException ioException) {
             ioException.printStackTrace();
         }

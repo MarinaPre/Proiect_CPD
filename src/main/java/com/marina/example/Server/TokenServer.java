@@ -10,16 +10,15 @@ import java.util.concurrent.atomic.AtomicLong;
 
 @Component
 public class TokenServer extends Thread {
-    private String token ;
-    private AtomicBoolean haveToken ;
-    private AtomicLong whenReceived ;
+    private String token;
+    private AtomicBoolean haveToken;
+    private AtomicLong whenReceived;
 
     public TokenServer(){
         this.token = "token123";
         this.haveToken = new AtomicBoolean(true);
         this.whenReceived = new AtomicLong(System.currentTimeMillis());
         this.start();
-
     }
 
     public void run()  {
@@ -27,7 +26,6 @@ public class TokenServer extends Thread {
         ServerSocket tokenChannel = null;
         try {
             tokenChannel = new ServerSocket(130);
-            System.out.println("tokenServer run 130");
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -38,14 +36,10 @@ public class TokenServer extends Thread {
             Socket socketForClient = null;
             try {
                 socketForClient = tokenChannel.accept();
-                System.out.println("tokenServer run 130 accept");
-
-                System.out.println("");
             } catch (IOException e) {
                 e.printStackTrace();
             }
             new ClientHandler(socketForClient, this).start();
-
         }
     }
 

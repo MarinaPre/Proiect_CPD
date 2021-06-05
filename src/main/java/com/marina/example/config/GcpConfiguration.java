@@ -25,11 +25,11 @@ public class GcpConfiguration {
   // Create an inbound channel adapter to listen to the subscription `CookingSub` and send
   // messages to the input message channel.
   @Bean
-  public PubSubInboundChannelAdapter inboundChannelAdapter(
+  public PubSubInboundChannelAdapter inboundChannelAdapterCooking(
           @Qualifier("cookingInputMessageChannel") MessageChannel messageChannel,
           PubSubTemplate pubSubTemplate) {
     PubSubInboundChannelAdapter adapter =
-            new PubSubInboundChannelAdapter(pubSubTemplate, "CookingSub");
+            new PubSubInboundChannelAdapter(pubSubTemplate, "CookingSubClient1");
     adapter.setOutputChannel(messageChannel);
     adapter.setAckMode(AckMode.MANUAL);
     adapter.setPayloadType(String.class);
@@ -43,7 +43,7 @@ public class GcpConfiguration {
 
   @Bean
   @ServiceActivator(inputChannel = "cookingOutputChannel")
-  public MessageHandler messageSender(PubSubTemplate pubsubTemplate) {
+  public MessageHandler messageSenderCooking(PubSubTemplate pubsubTemplate) {
     return new PubSubMessageHandler(pubsubTemplate, "Cooking");
   }
   // Create a message channel for messages arriving from the subscription `ArtSub`.
@@ -59,7 +59,7 @@ public class GcpConfiguration {
           @Qualifier("artInputMessageChannel") MessageChannel messageChannel,
           PubSubTemplate pubSubTemplate) {
     PubSubInboundChannelAdapter adapter =
-            new PubSubInboundChannelAdapter(pubSubTemplate, "ArtSub");
+            new PubSubInboundChannelAdapter(pubSubTemplate, "ArtSubClient1");
     adapter.setOutputChannel(messageChannel);
     adapter.setAckMode(AckMode.MANUAL);
     adapter.setPayloadType(String.class);

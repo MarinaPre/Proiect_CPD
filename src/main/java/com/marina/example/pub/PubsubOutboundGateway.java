@@ -1,6 +1,5 @@
 package com.marina.example.pub;
 
-
 import org.springframework.integration.annotation.Gateway;
 import org.springframework.integration.annotation.MessagingGateway;
 
